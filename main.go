@@ -28,20 +28,27 @@ func main() {
 		APPID = appIDEnv
 		APP_CERTIFICATE = appCertEnv
 	}
+// Initialize the Gin router with the prefix
+api := gin.Default()
+api.Use(gin.Logger())
+api.Use(gin.Recovery())
 
-	api := gin.Default()
+// Add the API prefix
+apiGroup := api.Group("/api")
 
-	api.GET("/ping", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{
-			"message":"pong",
-		})
+// Define a basic ping endpoint
+apiGroup.GET("/ping", func(ctx *gin.Context) {
+	ctx.JSON(200, gin.H{
+		"message": "pong",
 	})
+})
 
-	api.GET("rtc/:channelName/:role/:tokenType/:uid", getRtcToken)
-	api.GET("rtm/:uid", getRtmToken)
-	api.GET("rte/:channelName/:role/:tokenType/:uid", getBothTokens)
+// Define API endpoints for generating Agora RTC and RTM tokens
+apiGroup.GET("/rtc/:channelName/:role/:tokenType/:uid", getRtcToken)
+apiGroup.GET("/rtm/:uid", getRtmToken)
+apiGroup.GET("/rte/:channelName/:role/:tokenType/:uid", getBothTokens)
 
-	api.Run(":8000")
+	api.Run("0.0.0.0:8000")
 }
 
 
